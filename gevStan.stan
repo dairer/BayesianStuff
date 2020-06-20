@@ -30,13 +30,3 @@ model {
     target += Gev_lpdf(y[n] | location, shape, scale);
   }
 }
-
-
-
-
-
-
-
-
-
-

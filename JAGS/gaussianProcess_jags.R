@@ -5,7 +5,7 @@ library(MASS)
 library(ggplot2)
 
 
-N = 20 # can take to N = 100 but fitting gets really slow ...
+N = 20 
 alpha = 0
 sig = 0.05 # variance or each param
 tau = 1
@@ -27,11 +27,10 @@ covar <- function(x,y=x, tau, len, sig){
 Sigma = covar(xtrain,xtrain, tau = tau, len= len, sig = sig)
 
 ytrain = mvrnorm(1,rep(alpha,N), Sigma)
-plot(xtrain,ytrain) # Black is what you see
+plot(xtrain,ytrain) 
 
 # Jags code ---------------------------------------------------------------
 
-# Jags code for stage 1 with no input noise
 model_code = '
 model
 {
@@ -55,10 +54,6 @@ model
 }
 '
 
-# Simulated results -------------------------------------------------------
-
-# Run stage 1 with no input noise
-
 # Set up the data
 model_data = list(N = N, y = ytrain, x = xtrain)
 
@@ -73,10 +68,6 @@ model_run = jags(data = model_data,
 visualise_resilts(model_run)
 
 
-
-
-# visualise fit :)
-
 # generate predictions ...
 # we want to condition test points on priors
 # ----- maths 
@@ -88,59 +79,6 @@ visualise_resilts(model_run)
 # let x = train input and y = train output
 # mu = covar(test, x) * covar(train,train)^-1 * y
 # Sigma = covar(test, test) - covar(test, x)* covar(train,train)^-1 * covar(test, x)^T
-
-
-
-# ----- applied to real data
-
-data("msleep")
-xtrain = log(msleep$brainwt[!is.na(msleep$brainwt)])
-ytrain = msleep$sleep_total[!is.na(msleep$brainwt)]
-N = length(xtrain)
-
-plot(xtrain, ytrain)
-
-
-
-# Jags code for stage 1 with no input noise
-model_code_msleep = '
-model
-{
-  # Likelihood
-  y ~ dmnorm.vcov(Mu, Sigma)
-  
-  # Set up mean and covariance matrix
-  for(i in 1:N) {
-    Mu[i] <- alpha
-    Sigma[i,i] = pow(sig, 2) + pow(tau, 2)
-    for(j in (i+1):N) {
-      Sigma[i,j] = pow(tau, 2) * exp( - len * pow(x[i] - x[j], 2) )
-      Sigma[j,i] = Sigma[i,j]
-    }
-    
-  }
-  alpha ~ dnorm(0, 100^-2)
-  sig ~ dunif(0, 100)
-  tau ~ dunif(0, 100)
-  len ~ dunif(0, 100)
-}
-'
-
-# prep data
-model_data_real = list(N = length(xtrain), y = ytrain, x = xtrain)
-
-# parameters to watch
-model_parameters =  c("alpha", "sig", "tau", "len")
-
-model_run = jags(data = model_data_real,
-                 parameters.to.save = model_parameters,
-                 model.file=textConnection(model_code_msleep),
-                 n.iter=1000,
-                 n.chains = 4)
-
-traceplot(model_run)
-visualise_resilts(model_run)
-
 
 
 visualise_resilts = function(model){

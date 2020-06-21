@@ -1,5 +1,3 @@
-
-rm(list=ls()) # Clear the workspace
 library(R2jags)
 library(MASS)
 library(ggplot2)

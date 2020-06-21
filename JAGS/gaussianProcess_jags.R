@@ -6,10 +6,10 @@ library(ggplot2)
 N = 20 
 alpha = 0
 sig = 0.05 # variance or each param
-tau = 1
-len = 1
+tau = 4
+len = 2
 set.seed(123)
-xtrain = sort(runif(N))
+xtrain = runif(N)
 
 covar <- function(x,y=x, tau, len, sig){
   Sigma = matrix(NA, length(x),length(x))
@@ -27,7 +27,6 @@ Sigma = covar(xtrain,xtrain, tau = tau, len= len, sig = sig)
 ytrain = mvrnorm(1,rep(alpha,N), Sigma)
 plot(xtrain,ytrain) 
 
-# Jags code ---------------------------------------------------------------
 
 model_code = '
 model
@@ -63,7 +62,6 @@ model_run = jags(data = model_data,
                  parameters.to.save = model_parameters,
                  model.file=textConnection(model_code))
 
-visualise_resilts(model_run)
 
 
 # generate predictions ...
@@ -116,4 +114,6 @@ visualise_resilts = function(model){
     theme_minimal()
 }
 
+
+visualise_resilts(model_run)
 

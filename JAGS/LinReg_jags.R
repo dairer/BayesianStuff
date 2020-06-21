@@ -8,21 +8,6 @@ library(R2jags)
 library(ggplot2)
 library(gridExtra)
 
-# ------ model specifications
-# - - - - - - - - - - - - - - 
-# --- model
-# y ~ alpha + beta*x + noise
-# noise ~ gaussian(0, stdev)
-# therefore, y ~ gaussian(alpha + beta*x, stdev)
-
-# --- likelihood
-# y_1, ..., y_N | alpha_est, beta_est , stdev_est ~ Gaussian(mean = alpha_est + beta_est*x, standard deviation = stdev_est)
-
-# --- priors
-# alpha_est ~ Gaussian(mean = 0, standard deviation = 100)
-# beta_est ~ Gaussian(mean = 0, standard deviation = 100)
-# stdev_est ~ Gamma(shape = 1, scale = 1)
-
 
 # --- generate data from normal distribution
 alpha_0 = 1
